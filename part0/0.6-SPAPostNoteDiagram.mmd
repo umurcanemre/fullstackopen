@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant browser
+    participant server
+
+    Note right of browser: User clicks "Save". SPA JS takes over from onsubmit event
+
+    activate browser
+    browser-->browser: SPA JS prevents default page refresh behaviour 
+    browser-->browser: SPA JS drops the first note on page from internal list
+    browser-->browser: SPA JS adds the new note to the end of the list
+    browser-->browser: SPA JS redraws the notes list
+    deactivate browser
+
+    Note right of browser: SPA JS sends new note to the server for long term persistence
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    activate server
+    Note left of server: Server saves new note
+    server-->>browser: 201 response acknowledging creation took place on server side
+    deactivate server
