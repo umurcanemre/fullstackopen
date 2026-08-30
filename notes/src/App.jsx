@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
 import noteService from './services/notes'
+import Notification from './components/Notification'
+import Footer from './components/Footer'
 
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(null)
   console.log('render', notes.length, 'notes')
 
   useEffect(()=> {
@@ -47,7 +50,11 @@ const App = () => {
       setNotes(notes.map(n => n.id === note.id ? toggledNote : n))
     })
     .catch( e => {
-      alert(`the note ${note.content.substring(0, 5) + "..."} couldn't be updated`)
+      setErrorMessage(`Note '${note.content}' was already removed from server`)
+      setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      setNotes(notes.filter(n => n.id !== note.id))
     })
   }
 
@@ -56,6 +63,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
@@ -70,6 +78,7 @@ const App = () => {
         <input value={newNote} onChange={handleNoteChange} />
         <button type="submit">save</button>
       </form>
+      <Footer />
     </div>
   )
 }
