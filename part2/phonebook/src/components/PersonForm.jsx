@@ -14,12 +14,12 @@ const PersonForm = ({ addPerson }) => {
     const [newPhone, setNewPhone] = useState('')
 
     const controlName = (event) => {
-        console.log("entered ", event.target.value)
+        // console.log("entered ", event.target.value)
         setNewName(event.target.value)
     }
     const controlPhone = (event) => {
         const validity = phoneValid(event.target.value) ? 'valid' : 'invalid'
-        console.log(`entered ${validity} phone `, event.target.value)
+        // console.log(`entered ${validity} phone `, event.target.value)
         setNewPhone(event.target.value)
     }
     const onSubmit = (event) => {
