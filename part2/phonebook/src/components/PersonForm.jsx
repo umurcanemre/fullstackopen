@@ -15,19 +15,19 @@ const PersonForm = ({ addPerson }) => {
 
     const controlName = (event) => {
         // console.log("entered ", event.target.value)
-        setNewName(event.target.value)
+        setNewName(String(event.target.value))
     }
     const controlPhone = (event) => {
         const validity = phoneValid(event.target.value) ? 'valid' : 'invalid'
         // console.log(`entered ${validity} phone `, event.target.value)
-        setNewPhone(event.target.value)
+        setNewPhone(String(event.target.value))
     }
     const onSubmit = (event) => {
         event.preventDefault()
-        if (!phoneValid(newPhone)) {
+        if (!phoneValid(newPhone.trim())) {
             alert(`${newPhone} is invalid`)
         }
-        addPerson(newName, newPhone)
+        addPerson(newName.trim(), newPhone.trim())
         setNewName('')
         setNewPhone('')
     }
