@@ -6,14 +6,13 @@ import countryService from './services/countryService'
 function App() {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
-  const debug = true
+  const debug = false
   console.log("render with state ", countries)
 
   useEffect(() => {
     console.log("effect")
 
     countryService.getAll().then(resp => {
-      // setCountries(new Map(resp.map(c => [c.name.common, c])))
       setCountries(resp)
     })
   }, [])

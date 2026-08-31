@@ -1,7 +1,6 @@
 import Country from "./Country"
 
 const FilteredList = ({ countries, filter }) => {
-    // const selectedCountries = Array.from(countries.keys()).sort().filter(c => c.toLowerCase().includes(filter.toLowerCase()))
     const selectedCountries = countries.filter(c => c.name.common.toLowerCase().includes(filter.toLowerCase()))
     console.log("Showing filtered list of ", selectedCountries)
 
@@ -19,7 +18,7 @@ const FilteredList = ({ countries, filter }) => {
     }
     return (
         <div>
-            {selectedCountries.map(c => <div>{c.name.common}</div>)}
+            {selectedCountries.map(c => <div key={c.name.common}>{c.name.common}</div>)}
         </div>
     )
 }
