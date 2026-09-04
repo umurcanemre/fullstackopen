@@ -2,6 +2,8 @@ const express = require('express')
 const morgan = require('morgan');
 const app = express()
 app.use(express.json())
+app.use(express.static('dist'))
+
 morgan.token('body', (req) => {
   return JSON.stringify(req.body);
 });
@@ -47,7 +49,7 @@ app.get(baseUrl, (request, response) => {
 })
 
 app.get(baseUrl + '/:id', (request, response) => {
-    const person = persons.find(p => p.id === request.params.id)
+    const person = persons.find(p => p.id == request.params.id)
 
     if (person) {
         response.json(person)
@@ -82,7 +84,7 @@ app.post(baseUrl, (request, response) => {
 })
 
 app.delete(baseUrl + '/:id', (request, response) => {
-    persons = persons.filter(p => p.id !== request.params.id)
+    persons = persons.filter(p => p.id != request.params.id)
 
     response.status(204).end()
 })
