@@ -1,61 +1,34 @@
 const express = require('express')
 const morgan = require('morgan');
+const Person = require('./models/person')
+
 const app = express()
 app.use(express.json())
 app.use(express.static('dist'))
 
 morgan.token('body', (req) => {
-  return JSON.stringify(req.body);
+    return JSON.stringify(req.body);
 });
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 
 const baseUrl = '/api/persons'
-let persons = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
 
-const generateId = () => {
-    const ceiling = 100
-    let id = 0
-
-    do {
-        id = Math.floor(Math.random() * ceiling)
-    } while (persons.find(p => p.id === String(id)))
-    return id
-}
 
 app.get(baseUrl, (request, response) => {
-    response.json(persons)
+    Person.find({}).then(p => {
+        response.json(p)
+    })
 })
 
 app.get(baseUrl + '/:id', (request, response) => {
-    const person = persons.find(p => p.id == request.params.id)
 
-    if (person) {
-        response.json(person)
-    }
+    Person.findById(request.params.id)
+        .then(p => {
+            response.json(p)
+        })
+        .catch(e => response.status(404).end())
 
-    response.status(404).end()
 })
 
 app.post(baseUrl, (request, response) => {
@@ -63,37 +36,38 @@ app.post(baseUrl, (request, response) => {
 
     if (!body.name || !body.number) {
         return response
-        .status(400)
-        .json({ error: "name and body fields are necessary" })
+            .status(400)
+            .json({ error: "name and body fields are necessary" })
     }
 
-    if (persons.find(p => p.name === body.name)) {
-        return response
-        .status(400)
-        .json({ error: `Name ${body.name} already exists`})
-    }
 
-    const newPerson = {
-        id: generateId(),
-        name: body.name,
-        number: body.number
-    }
+    const newPerson = new Person({
+        name: request.body.name,
+        number: request.body.number
+    })
 
-    persons = persons.concat(newPerson)
-    response.status(201).json(newPerson)
+    newPerson.save()
+        .then(p => response.status(201).json(p))
+        .catch(e => response.status(500).end())
 })
 
 app.delete(baseUrl + '/:id', (request, response) => {
-    persons = persons.filter(p => p.id != request.params.id)
-
-    response.status(204).end()
+    console.log(`deleting person with id ${request.params.id}`)
+    Person.findByIdAndDelete(request.params.id)
+        .then(p => {
+            response.status(204).end()
+        })
+        .catch(e =>
+            console.log("delete error", e)
+                .status(404).end())
 })
 
 app.get('/info', (request, response) => {
-    const info = `<p>Phonebook has info for ${persons.length} people</p>`
-        .concat(`<p>${new Date()}</p>`)
-
-    response.send(info)
+    Person.find({}).then(p => {
+        const info = `<p>Phonebook has info for ${p.length} people</p>`
+            .concat(`<p>${new Date()}</p>`)
+        response.send(info)
+    })
 })
 
 const PORT = 3001
