@@ -7,3 +7,9 @@
 - [HTML Forms](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Your_first_HTML_form)
 - [JS Fatigue](https://auth0.com/blog/how-to-manage-javascript-fatigue/)
   
+
+## Part 3
+
+### Exercise 3.9-11
+
+[Test here](https://fullstackopen-3w0z.onrender.com/)
