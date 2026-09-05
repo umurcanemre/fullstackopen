@@ -47,6 +47,7 @@ const App = () => {
     .then(toggledNote => {
       console.log(`importance of ${note.id} is toggled from ${note.important} to ${!note.important}`)
       setNotes(notes.map(n => n.id === note.id ? toggledNote : n))
+      setReloadFlag(!reloadFlag)
     })
     .catch( e => {
       setErrorMessage(`Note '${note.content}' was already removed from server`)
