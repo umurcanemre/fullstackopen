@@ -15,6 +15,21 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 const baseUrl = '/api/persons'
 
 
+const errorHandler = (error, request, response, next) => {
+    console.log(`error name ${error.name}`)
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
 app.get(baseUrl, (request, response) => {
     Person.find({}).then(p => {
         response.json(p)
@@ -25,9 +40,26 @@ app.get(baseUrl + '/:id', (request, response) => {
 
     Person.findById(request.params.id)
         .then(p => {
-            response.json(p)
+            if (p) {
+                response.json(p)
+            } else {
+                response.status(404).end()
+            }
         })
-        .catch(e => response.status(404).end())
+        .catch(e => response.status(500).end())
+})
+
+app.put(baseUrl + '/:id', (request, response) => {
+
+    Person.findByIdAndUpdate(request.params.id, request.body)
+        .then(p => {
+            if (p) {
+                response.json(p)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(e => response.status(500).end())
 
 })
 
@@ -59,7 +91,7 @@ app.delete(baseUrl + '/:id', (request, response) => {
         })
         .catch(e =>
             console.log("delete error", e)
-                .status(404).end())
+                .status(500).end())
 })
 
 app.get('/info', (request, response) => {
@@ -70,6 +102,8 @@ app.get('/info', (request, response) => {
     })
 })
 
+app.use(unknownEndpoint)
+app.use(errorHandler)
 const PORT = 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
