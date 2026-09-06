@@ -22,12 +22,15 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
     }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
+    }
 
     next(error)
 }
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+    response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.get(baseUrl, (request, response) => {
@@ -63,7 +66,7 @@ app.put(baseUrl + '/:id', (request, response) => {
 
 })
 
-app.post(baseUrl, (request, response) => {
+app.post(baseUrl, (request, response, next) => {
     const body = request.body
 
     if (!body.name || !body.number) {
@@ -80,7 +83,10 @@ app.post(baseUrl, (request, response) => {
 
     newPerson.save()
         .then(p => response.status(201).json(p))
-        .catch(e => response.status(500).end())
+        .catch(e => {
+            console.log("save error: ", e)
+            next(e)
+        })
 })
 
 app.delete(baseUrl + '/:id', (request, response) => {

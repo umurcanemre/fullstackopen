@@ -9,12 +9,15 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
     }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
+    }
 
     next(error)
 }
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+    response.status(404).send({ error: 'unknown endpoint' })
 }
 
 const app = express()
@@ -61,12 +64,7 @@ app.delete('/api/notes/:id', (request, response) => {
 
 })
 
-app.post('/api/notes', (request, response) => {
-    if (!request.body.content) {
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
+app.post('/api/notes', (request, response, next) => {
 
     const note = new Note({
         content: request.body.content,
@@ -77,10 +75,7 @@ app.post('/api/notes', (request, response) => {
             console.log('note saved!')
             response.status(201).json(result)
         })
-        .catch(e => {
-            console.log("save error :", e)
-            response.status(500).end()
-        })
+        .catch(e => next(e))
 })
 
 app.put('/api/notes/:id', (request, response) => {

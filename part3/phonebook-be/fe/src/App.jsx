@@ -59,6 +59,7 @@ const App = () => {
         }, 5000)
       }).catch(e => {
         setNotification({ message: `Phone number for ${personRecord.name} couldn't be saved`, type: "error" })
+        console.log(`save error`, e)
         setTimeout(() => {
           setNotification(null)
         }, 5000)
