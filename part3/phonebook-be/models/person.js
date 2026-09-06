@@ -4,20 +4,18 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 const url = process.env.MONGODB_URI
 
-console.log('connecting to', url.substring(0,20).concat("..."))
+console.log('connecting to', url.substring(0, 20).concat('...'))
 mongoose.connect(url, { family: 4 })
 
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
+  .then(console.log('connected to MongoDB'))
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
   })
 const phoneValidator = (value) => {
-  if (!value) return false;
-  if (value.length < 8) return false;
-  return /^\d{2,3}-\d+$/.test(value);
-};
+  if (!value) return false
+  if (value.length < 8) return false
+  return /^\d{2,3}-\d+$/.test(value)
+}
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
