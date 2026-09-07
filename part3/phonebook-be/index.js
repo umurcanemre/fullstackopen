@@ -36,10 +36,13 @@ const unknownEndpoint = (request, response) => {
 app.get(baseUrl, (request, response) => {
   Person.find({}).then(p => {
     response.json(p)
+  }).catch(e => {
+    console.error('find all error :', e)
+    response.status(500).end()
   })
 })
 
-app.get(baseUrl + '/:id', (request, response) => {
+app.get(baseUrl + '/:id', (request, response, next) => {
 
   Person.findById(request.params.id)
     .then(p => {
@@ -49,10 +52,10 @@ app.get(baseUrl + '/:id', (request, response) => {
         response.status(404).end()
       }
     })
-    .catch(response.status(500).end())
+    .catch(e => next(e))
 })
 
-app.put(baseUrl + '/:id', (request, response) => {
+app.put(baseUrl + '/:id', (request, response, next) => {
 
   Person.findByIdAndUpdate(request.params.id, request.body)
     .then(p => {
@@ -62,20 +65,11 @@ app.put(baseUrl + '/:id', (request, response) => {
         response.status(404).end()
       }
     })
-    .catch(response.status(500).end())
+    .catch(e => next(e))
 
 })
 
 app.post(baseUrl, (request, response, next) => {
-  const body = request.body
-
-  if (!body.name || !body.number) {
-    return response
-      .status(400)
-      .json({ error: 'name and body fields are necessary' })
-  }
-
-
   const newPerson = new Person({
     name: request.body.name,
     number: request.body.number
