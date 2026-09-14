@@ -13,9 +13,10 @@ DELETE  http://localhost:3001/api/notes/3
 ###
 POST  http://localhost:3001/api/notes
 content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVtdXJjYW4iLCJpZCI6IjZhYTE4YmIxMDc1OWViNTliMDlhODE5YyIsImlhdCI6MTc4OTMzODAxNX0.qLIyti1bA1Cqj2tOmiCfRb_rVFpFhhVzgDZMxj8DH3U
 
 {
-    "content": "sample",
+    "content": "sample authnd 3",
     "important": true
 }
 
@@ -28,3 +29,38 @@ content-type: application/json
     "content": "non-important sample"
 }
 
+###
+
+POST  http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "umurcan",
+    "name": "umurcan",
+    "password": "password"
+}
+###
+
+GET  http://localhost:3001/api/users
+
+###
+
+GET  http://localhost:3001/api/users/6aa18bb10759eb59b09a819c
+content-type: application/json
+
+### 
+POST  http://localhost:3001/api/login
+content-type: application/json
+
+{
+    "username": "umurcan",
+    "password": "password"
+}
+### 
+POST  http://localhost:3001/api/login
+content-type: application/json
+
+{
+    "username": "umurcan",
+    "password": "wrongpassword"
+}
