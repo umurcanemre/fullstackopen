@@ -12,7 +12,9 @@ blogRouter.get('/:id', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-  const user = await User.findById(request.body.userId)
+  console.log("request received ", request.userId)
+  const user = await User.findById(request.userId)
+  console.log("user found ", user)
   if (!user) {
     return response.status(400).json({ error: 'userId missing or not valid' })
   }
@@ -24,6 +26,12 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
+  console.log(`deleting blog ${request.params.id}, for user ${request.userId}`)
+  const blog = await Blog.find({ _id:request.params.id,  user: request.userId })
+  
+  if(!blog) {
+    return response.status(403).end()
+  }
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })

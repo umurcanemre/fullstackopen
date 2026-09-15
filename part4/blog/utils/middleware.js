@@ -1,4 +1,5 @@
 const morgan = require('morgan')
+const tokenHandler = require('./tokenHandler')
 
 const errorHandler = (error, request, response, next) => {
   console.log(`error name ${error.name}`)
@@ -14,7 +15,15 @@ const errorHandler = (error, request, response, next) => {
     console.log('mongo server error', error.message)
     return response.status(400).json({ error: 'expected unique' })
   }
-  next(error)
+  else if (error.name === 'JsonWebTokenError') {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  else if (error.name === 'TokenExpiredError') {
+    return response.status(401).json({
+      error: 'token expired'
+    })
+    next(error)
+  }
 }
 
 const unknownEndpoint = (request, response) => {
@@ -27,4 +36,19 @@ morgan.token('body', (req) => {
   return JSON.stringify(req.body)
 })
 
-module.exports = { requestLogger, errorHandler, unknownEndpoint }
+
+const securedEndpoint = async (request, response, next) => {
+  console.log('request header', request.headers)
+  const securedByUser = [['/api/blogs', 'POST'], ['/api/blogs', 'DELETE']]
+  if (securedByUser.some(it => request.url.startsWith(it[0]) && it[1] === request.method)) {
+    console.log(`url secured`)
+    if (!request.headers.authorization) {
+      console.log(`authn header not present`)
+      return response.status(401).json({ error: 'token expected' })
+    }
+    request.userId = await tokenHandler.getIdOfToken(request)
+  }
+  next()
+}
+
+module.exports = { requestLogger, errorHandler, unknownEndpoint, securedEndpoint }

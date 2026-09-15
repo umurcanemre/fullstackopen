@@ -9,7 +9,6 @@ const helper = require('./test_helper')
 
 const api = supertest(app)
 
-
 beforeEach(async () => {
   await User.deleteMany({})
   await Blog.deleteMany({})
@@ -56,8 +55,8 @@ test('a specific user can be viewed', async () => {
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
-  console.log('result user', resultUser.body)
-  console.log('expected user blogs', blogsObjInDb)
+  // console.log('result user', resultUser.body)
+  // console.log('expected user blogs', blogsObjInDb)
 
   assert.strictEqual(resultUser.body.name, userToView.name)
   assert.strictEqual(resultUser.body.username, userToView.username)
@@ -147,6 +146,7 @@ test('user with 2 char username is not added', async () => {
   const userAtEnd = await helper.usersInDb()
   assert.strictEqual(userAtEnd.length, helper.initialUsers.length)
 })
+
 test('user with 2 char pwd is not added', async () => {
   const newUser = {
     name: 'testuser name',
@@ -161,6 +161,51 @@ test('user with 2 char pwd is not added', async () => {
 
   const userAtEnd = await helper.usersInDb()
   assert.strictEqual(userAtEnd.length, helper.initialUsers.length)
+})
+
+test('user can login', async () => {
+  const loginRequest = {
+    password: 'password',
+    username: helper.initialUsers[0].username
+  }
+
+  const resp = await api
+    .post('/api/login')
+    .send(loginRequest)
+    .expect(200)
+
+  assert.notStrictEqual(resp.body.token, undefined);
+  assert.strictEqual(typeof resp.body.token, 'string');
+  const parts = resp.body.token.split('.');
+  assert.strictEqual(parts.length, 3, 'Token must have 3 parts');
+})
+
+
+test('user cant login with wrong password', async () => {
+
+  const loginRequest = {
+    password: 'pazzword',
+    username: helper.initialUsers[0].username
+  }
+
+  const resp = await api
+    .post('/api/login')
+    .send(loginRequest)
+    .expect(401)
+})
+
+
+test('user cant login with wrong username', async () => {
+
+  const loginRequest = {
+    password: 'password',
+    username: helper.initialUsers[0].username + 'gsdjns'
+  }
+
+  const resp = await api
+    .post('/api/login')
+    .send(loginRequest)
+    .expect(401)
 })
 
 

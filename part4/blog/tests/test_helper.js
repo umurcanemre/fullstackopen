@@ -3,11 +3,12 @@ const User = require('../models/user')
 
 const initialUsers = [
   {
-    username: 'initial username',
-    name: 'initial user name',
-    passwordHash: 'initpwd'
+    username: 'initial testusername',
+    name: 'test user name',
+    passwordHash: '$2b$10$cHjKEV5DCsv2dxhV8CciMOPgXqOb9yPg/sCa/SEulidJ9yVYwYrU6' // password
   }
 ]
+
 const initialBlogs = [
   {
     title: 'Go To Statement Considered Harmful',

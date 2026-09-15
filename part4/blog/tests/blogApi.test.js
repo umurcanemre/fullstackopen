@@ -64,11 +64,11 @@ test('a valid blog can be added ', async () => {
     author: "umurcan emre",
     url: "https://myblog.com/async",
     likes: 1,
-    userId: usersAtStart[0].id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -85,11 +85,12 @@ test('blog without title is not added', async () => {
     author: "umurcan emre",
     url: "https://myblog.com/async",
     likes: 1,
-    userId: usersAtStart[0].id
+    // userId: usersAtStart[0].id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(newBlog)
     .expect(400)
 
@@ -104,11 +105,12 @@ test('blog without author is not added', async () => {
     title: 'async/await simplifies making async calls',
     url: "https://myblog.com/async",
     likes: 1,
-    userId: usersAtStart[0].id
+    // userId: usersAtStart[0].id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(newBlog)
     .expect(400)
 
@@ -123,11 +125,12 @@ test('blog without url is not added', async () => {
     title: 'async/await simplifies making async calls',
     author: "umurcan emre",
     likes: 1,
-    userId: usersAtStart[0].id
+    // userId: usersAtStart[0].id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(newBlog)
     .expect(400)
 
@@ -136,7 +139,7 @@ test('blog without url is not added', async () => {
 })
 
 
-test('blog without user is not added', async () => {
+test('blog without auth header is not added', async () => {
   const newBlog = {
     title: 'async/await simplifies making async calls',
     author: "umurcan emre",
@@ -146,7 +149,7 @@ test('blog without user is not added', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
-    .expect(400)
+    .expect(401)
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
@@ -163,6 +166,7 @@ test('blog likes is defaulted to 0 likes', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(newBlog)
     .expect(201)
     .expect(res => {
@@ -176,16 +180,29 @@ test('blog likes is defaulted to 0 likes', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
 })
 
-test('blog can be deleted', async () => {
+test('blog can be deleted by owner', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToDelete = blogsAtStart[0]
   await api
     .delete('/api/blogs/' + blogToDelete.id)
+    .set('Authorization', await getUserToken())
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
   assert.strictEqual(blogsAtEnd.some(b => b.id === blogToDelete.id), false)
+})
+
+test('blog cant be deleted without authorization', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+  await api
+    .delete('/api/blogs/' + blogToDelete.id)
+    .expect(401)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  assert.strictEqual(blogsAtEnd.some(b => b.id === blogToDelete.id), true)
 })
 
 test('existing blog can be updated', async () => {
@@ -212,6 +229,22 @@ test('non existent blog cant be updated', async () => {
     .send(nonExistentBlog)
     .expect(404)
 })
+
+const getUserToken = async () => {
+  console.log('getting user token')
+  const loginRequest = {
+    password: 'password',
+    username: helper.initialUsers[0].username
+  }
+
+  const resp = await api
+    .post('/api/login')
+    .send(loginRequest)
+    .expect(200)
+
+  console.log('returning user token', resp.body.token)
+  return 'Bearer ' + resp.body.token
+}
 
 after(async () => {
   await mongoose.connection.close()
