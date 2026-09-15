@@ -4,6 +4,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
 
 const api = supertest(app)
@@ -11,10 +12,17 @@ const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
   console.log('cleared')
 
+  const userObjs = helper.initialUsers
+    .map(u => new User(u))
+  const promiseUserArray = userObjs.map(u => u.save())
+  await Promise.all(promiseUserArray)
+  const usersInDb = await helper.usersInDb()
+
   const blogObjs = helper.initialBlogs
-    .map(b => new Blog(b))
+    .map(b => new Blog({ ...b, user: usersInDb[0].id }))
   const promiseArray = blogObjs.map(b => b.save())
   await Promise.all(promiseArray)
   console.log('done')
@@ -34,25 +42,29 @@ test('all blogs are returned', async () => {
   assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
-test('a specific blog can be viewed', async () => {
+test('a specific blog can be viewed with user', async () => {
   const blogsAtStart = await helper.blogsInDb()
-  const blogToView = blogsAtStart[0]
+  const usersAtStart = await helper.usersInDb()
+  const blogToView = { ...blogsAtStart[0], user: usersAtStart[0] }
 
   const resultBlog = await api
     .get(`/api/blogs/${blogToView.id}`)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
+  console.log('specific blog result', resultBlog.body)
   assert.deepStrictEqual(resultBlog.body, blogToView)
 })
 
 
 test('a valid blog can be added ', async () => {
+  const usersAtStart = await helper.usersInDb()
   const newBlog = {
     title: 'async/await simplifies making async calls',
     author: "umurcan emre",
     url: "https://myblog.com/async",
-    likes: 1
+    likes: 1,
+    userId: usersAtStart[0].id
   }
 
   await api
@@ -68,10 +80,12 @@ test('a valid blog can be added ', async () => {
 })
 
 test('blog without title is not added', async () => {
+  const usersAtStart = await helper.usersInDb()
   const newBlog = {
     author: "umurcan emre",
     url: "https://myblog.com/async",
-    likes: 1
+    likes: 1,
+    userId: usersAtStart[0].id
   }
 
   await api
@@ -85,10 +99,12 @@ test('blog without title is not added', async () => {
 
 
 test('blog without author is not added', async () => {
+  const usersAtStart = await helper.usersInDb()
   const newBlog = {
     title: 'async/await simplifies making async calls',
     url: "https://myblog.com/async",
-    likes: 1
+    likes: 1,
+    userId: usersAtStart[0].id
   }
 
   await api
@@ -102,6 +118,25 @@ test('blog without author is not added', async () => {
 
 
 test('blog without url is not added', async () => {
+  const usersAtStart = await helper.usersInDb()
+  const newBlog = {
+    title: 'async/await simplifies making async calls',
+    author: "umurcan emre",
+    likes: 1,
+    userId: usersAtStart[0].id
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
+
+test('blog without user is not added', async () => {
   const newBlog = {
     title: 'async/await simplifies making async calls',
     author: "umurcan emre",
@@ -118,10 +153,12 @@ test('blog without url is not added', async () => {
 })
 
 test('blog likes is defaulted to 0 likes', async () => {
+  const usersAtStart = await helper.usersInDb()
   const newBlog = {
     title: 'async/await simplifies making async calls no likes',
     author: "umurcan emre",
-    url: 'https://myblog/blog'
+    url: 'https://myblog/blog',
+    userId: usersAtStart[0].id
   }
 
   await api
@@ -154,7 +191,7 @@ test('blog can be deleted', async () => {
 test('existing blog can be updated', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToUpdate = blogsAtStart[0]
-  const updatedBlog = { ...blogToUpdate, author: "someone else", title: "something else", likes:blogToUpdate.likes + 10 }
+  const updatedBlog = { ...blogToUpdate, author: "someone else", title: "something else", likes: blogToUpdate.likes + 10 }
 
   await api
     .put('/api/blogs')

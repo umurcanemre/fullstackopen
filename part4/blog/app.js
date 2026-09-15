@@ -1,4 +1,6 @@
 const blogRoute = require('./controllers/blog')
+const userRoute = require('./controllers/users')
+
 const mongoose = require('mongoose')
 const express = require('express')
 const config = require('./utils/config')
@@ -13,6 +15,7 @@ mongoose.connect(config.MONGODB_URI, { family: 4 })
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use('/api/blogs', blogRoute)
+app.use('/api/users', userRoute)
 app.use(middleware.errorHandler)
 app.use(middleware.unknownEndpoint)
 
