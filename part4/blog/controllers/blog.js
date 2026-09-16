@@ -37,12 +37,12 @@ blogRouter.delete('/:id', async (request, response) => {
 })
 
 blogRouter.put('/', async (request, response) => {
-  const found = await Blog.findByIdAndUpdate(request.body.id, request.body)
+  const found = await Blog.findOneAndUpdate({_id:request.body.id, user: request.userId}, request.body)
   if (found) {
     response.status(200).json(found)
   }
   else {
-    response.status(404).end()
+    response.status(403).end()
   }
 })
 module.exports = blogRouter

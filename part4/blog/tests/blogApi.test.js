@@ -212,6 +212,7 @@ test('existing blog can be updated', async () => {
 
   await api
     .put('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(updatedBlog)
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -226,8 +227,9 @@ test('non existent blog cant be updated', async () => {
 
   await api
     .put('/api/blogs')
+    .set('Authorization', await getUserToken())
     .send(nonExistentBlog)
-    .expect(404)
+    .expect(403)
 })
 
 const getUserToken = async () => {

@@ -39,7 +39,7 @@ morgan.token('body', (req) => {
 
 const securedEndpoint = async (request, response, next) => {
   console.log('request header', request.headers)
-  const securedByUser = [['/api/blogs', 'POST'], ['/api/blogs', 'DELETE']]
+  const securedByUser = [['/api/blogs', 'POST'], ['/api/blogs', 'PUT'], ['/api/blogs', 'DELETE']]
   if (securedByUser.some(it => request.url.startsWith(it[0]) && it[1] === request.method)) {
     console.log(`url secured`)
     if (!request.headers.authorization) {
