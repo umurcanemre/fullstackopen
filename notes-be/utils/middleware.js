@@ -29,8 +29,8 @@ const unknownEndpoint = (request, response) => {
 }
 
 const securedEndpoint = async (request, response, next) => {
-  const securedByUser = [['/api/notes', 'POST']]
-  if (securedByUser.some(it => it[0] === request.url && it[1] === request.method)) {
+  const securedByUser = [['/api/notes', 'POST'],['/api/notes', 'PUT']]
+  if (securedByUser.some(it => request.url.startsWith(it[0]) && it[1] === request.method)) {
     if (!request.headers.authorization) {
       return response.status(401).json({ error: 'token expected' })
     }

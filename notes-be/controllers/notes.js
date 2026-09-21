@@ -44,7 +44,7 @@ notesRouter.post('/', async (request, response) => {
   response.status(201).json(saved)
 })
 
-notesRouter.put('/:id', (request, response) => {
+notesRouter.put('/:id', async (request, response) => {
 
   if (!request.body.content) {
     return response.status(400).json({
@@ -52,9 +52,13 @@ notesRouter.put('/:id', (request, response) => {
     })
   }
 
-  Note.findByIdAndUpdate(request.params.id, request.body)
+  const user = await User.findById(request.userId)
+
+  log.info(`user for note update ${user._id}`)
+
+  Note.findByIdAndUpdate(request.params.id, { ...request.body, user: user._id })
     .then(found => {
-      if (found) {
+      if (found && found.user.toString() === user._id.toString()) {
         response.status(200).json(found)
       }
       else {

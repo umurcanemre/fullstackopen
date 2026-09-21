@@ -4,7 +4,6 @@ const notesRouter = require('./controllers/notes')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware')
-const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
 
@@ -24,7 +23,6 @@ mongoose.connect(url, { family: 4 })
   })
 
 
-app.use(cors())
 app.use(express.json())
 app.use(express.static('dist'))
 
