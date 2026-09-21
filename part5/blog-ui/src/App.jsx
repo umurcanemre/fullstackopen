@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -7,7 +8,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  console.log("rendering app")
+  console.log('rendering app')
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -107,7 +108,7 @@ const App = () => {
               <label>
                 username
                 <input
-                  type="text"
+                  type='text'
                   value={username}
                   onChange={({ target }) => setUsername(target.value)}
                 />
@@ -117,13 +118,13 @@ const App = () => {
               <label>
                 password
                 <input
-                  type="password"
+                  type='password'
                   value={password}
                   onChange={({ target }) => setPassword(target.value)}
                 />
               </label>
             </div>
-            <button type="submit">login</button>
+            <button type='submit'>login</button>
           </form>
         </div>
       )

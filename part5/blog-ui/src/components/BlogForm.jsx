@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import blogsService from '../services/blogs'
 
-const BlogForm = ({refreshPage, refreshState}) => {
+const BlogForm = ({ refreshPage, refreshState }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
   const createBlog = async () => {
-    await blogsService.createBlog({title, author, url})
+    await blogsService.createBlog({ title, author, url })
     refreshPage(!refreshState)
     setTitle('')
     setAuthor('')
