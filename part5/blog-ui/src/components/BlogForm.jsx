@@ -6,10 +6,12 @@ const BlogForm = ({refreshPage, refreshState}) => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-
   const createBlog = async () => {
     await blogsService.createBlog({title, author, url})
     refreshPage(!refreshState)
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   return (

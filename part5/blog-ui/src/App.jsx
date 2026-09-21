@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -21,7 +22,7 @@ const App = () => {
       try {
         const retrievedBlogs = await blogService.getAll()
         console.log('retrieved blogs ', retrievedBlogs)
-        setBlogs(retrievedBlogs)
+        setBlogs(retrievedBlogs.sort((a,b) => {return b.likes-a.likes}))
       } catch {
         e => {
           setNotificationMessage(e)
@@ -90,7 +91,7 @@ const App = () => {
     return (
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} refreshPage={() => {setRefresh(!refresh)}} />
         )}
       </div>
     )
@@ -142,7 +143,11 @@ const App = () => {
       <h2>blogs</h2>
       <Notification message={notificationMessage} type={notificationType} />
       {auth()}
-      {user && <BlogForm refreshPage={setRefresh} refreshState={refresh}></BlogForm>}
+      {user &&
+        <Togglable initialState='false' label='create new blog'>
+          <BlogForm refreshPage={setRefresh} refreshState={refresh}></BlogForm>
+        </Togglable>
+      }
       {user && blogList()}
     </div>
   )
