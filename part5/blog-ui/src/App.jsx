@@ -23,7 +23,7 @@ const App = () => {
       try {
         const retrievedBlogs = await blogService.getAll()
         console.log('retrieved blogs ', retrievedBlogs)
-        setBlogs(retrievedBlogs.sort((a,b) => {return b.likes-a.likes}))
+        setBlogs(retrievedBlogs.sort((a, b) => { return b.likes - a.likes }))
       } catch {
         e => {
           setNotificationMessage(e)
@@ -92,7 +92,10 @@ const App = () => {
     return (
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} refreshPage={() => {setRefresh(!refresh)}} />
+          <Blog key={blog.id}
+            blog={blog}
+            refreshPage={() => { setRefresh(!refresh) }}
+            likeBlog={(lb) => {blogService.likeBlog(lb).then(() => { setRefresh(!refresh) })}} />
         )}
       </div>
     )

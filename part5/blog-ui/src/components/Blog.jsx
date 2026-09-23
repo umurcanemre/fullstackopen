@@ -8,13 +8,13 @@ const blogStyle = {
   borderWidth: 1,
   marginBottom: 5
 }
-const Blog = ({ blog, refreshPage }) => {
+const Blog = ({ blog, refreshPage, likeBlog }) => {
   const [detailed, setDetailed] = useState(false)
   const showDetails = { display: detailed ? '' : 'none' }
   const hideDetails = { display: detailed ? 'none' : '' }
 
   const toggleDetail = () => setDetailed(!detailed)
-  const likeCurrent = () => blogsService.likeBlog(blog).then(() => { refreshPage() })
+  // const likeCurrent = () => likeBlog(blog).then(() => { refreshPage() })
   const deleteCurrent = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       blogsService.deleteBlog(blog).then(() => { refreshPage() })
@@ -27,13 +27,10 @@ const Blog = ({ blog, refreshPage }) => {
       <button style={hideDetails} onClick={toggleDetail}>view</button>
       <button style={showDetails} onClick={toggleDetail}>hide</button>
       <div style={showDetails}>
-        {blog.url}
-        <br />
-        likes {blog.likes} <button onClick={likeCurrent}>like</button>
-        <br />
-        {blog.user.username}
-        <br />
-        <button onClick={deleteCurrent}>remove</button>
+        <div>{blog.url}</div>
+        <div>likes {blog.likes}<button onClick={() => likeBlog(blog)}>like</button></div>
+        <div>{blog.user.username}</div>
+        <div><button onClick={deleteCurrent}>remove</button></div>
       </div>
     </div>
   )
