@@ -1,0 +1,26 @@
+{
+  "name": "fullstackopen",
+  "version": "1.0.0",
+  "description": "- [HTML](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics) - [CSS](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics) - [HTML Forms](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Your_first_HTML_form) - [JS Fatigue](https://auth0.com/blog/how-to-manage-javascript-fatigue/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umurcanemre/fullstackopen.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/umurcanemre/fullstackopen/issues"
+  },
+  "homepage": "https://github.com/umurcanemre/fullstackopen#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.2"
+  }
+}

@@ -94,6 +94,7 @@ const App = () => {
         {blogs.map(blog =>
           <Blog key={blog.id}
             blog={blog}
+            user={user}
             refreshPage={() => { setRefresh(!refresh) }}
             likeBlog={(lb) => {blogService.likeBlog(lb).then(() => { setRefresh(!refresh) })}} />
         )}
