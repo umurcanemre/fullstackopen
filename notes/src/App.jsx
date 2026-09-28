@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import Note from './components/Note'
 import NoteForm from './components/NoteForm'
+import NoteList from './components/NoteList'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import noteService from './services/notes'
@@ -11,7 +11,6 @@ import Footer from './components/Footer'
 const App = () => {
   const noteFormRef = useRef()
   const [notes, setNotes] = useState([])
-  const [showAll, setShowAll] = useState(true)
   const [reloadFlag, setReloadFlag] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
@@ -56,29 +55,11 @@ const App = () => {
       }, 5000)
     }
   }
-  const addNote = (noteObject) => noteService.create(noteObject).then(() => {   
+  const addNote = (noteObject) => noteService.create(noteObject).then(() => {
     noteFormRef.current.toggleVisibility()
-    setReloadFlag(!reloadFlag) 
+    setReloadFlag(!reloadFlag)
   })
 
-  const toggleImportance = (note) => {
-    const updatedNote = { ...note, important: !note.important }
-    noteService.update(updatedNote)
-      .then(toggledNote => {
-        console.log(`importance of ${note.id} is toggled from ${note.important} to ${!note.important}`)
-        setNotes(notes.map(n => n.id === note.id ? toggledNote : n))
-        setReloadFlag(!reloadFlag)
-      })
-      .catch(e => {
-        setErrorMessage(`Note '${note.content}' was already removed from server`)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
-        setNotes(notes.filter(n => n.id !== note.id))
-      })
-  }
-
-  const notesToShow = showAll ? notes : notes.filter((note) => note.important)
 
   return (
     <div>
@@ -102,16 +83,18 @@ const App = () => {
             createNote={addNote}
           />
         </Togglable>}
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all'}
-        </button>
-      </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note key={note.id} note={note} toggleImportance={() => toggleImportance(note)} />
-        ))}
-      </ul>
+
+      <NoteList
+        notes={notes}
+        reload={() => setReloadFlag(!reloadFlag)}
+        errNotif={() => {
+          setErrorMessage(`Note couldn't be updated`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        }}
+      />
+      
       <Footer />
     </div>
   )
