@@ -1,11 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom'
 
-const Note = ({ notes, toggleImportance, removeNote }) => {
+const Note = ({ note, toggleImportance, removeNote }) => {
   const navigate = useNavigate()
   console.log('params', useParams())
   const id = useParams().id
   console.log('id', id)
-  const note = notes.find(n => n.id === id)
   console.log('selected note', note)
 
   if (!note) {
