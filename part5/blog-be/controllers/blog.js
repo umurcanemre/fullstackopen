@@ -18,7 +18,7 @@ blogRouter.post('/', async (request, response) => {
   if (!user) {
     return response.status(400).json({ error: 'userId missing or not valid' })
   }
-  
+
   const blog = new Blog({ ...request.body, user: user._id, likes: request.body.likes ? request.body.likes : 0 })
 
   const saved = await blog.save()
@@ -27,9 +27,9 @@ blogRouter.post('/', async (request, response) => {
 
 blogRouter.delete('/:id', async (request, response) => {
   console.log(`deleting blog ${request.params.id}, for user ${request.userId}`)
-  const blog = await Blog.find({ _id:request.params.id,  user: request.userId })
-  
-  if(!blog) {
+  const blog = await Blog.find({ _id: request.params.id, user: request.userId })
+
+  if (!blog) {
     return response.status(403).end()
   }
   await Blog.findByIdAndDelete(request.params.id)
@@ -37,12 +37,26 @@ blogRouter.delete('/:id', async (request, response) => {
 })
 
 blogRouter.put('/', async (request, response) => {
-  const found = await Blog.findOneAndUpdate({_id:request.body.id, user: request.userId}, request.body)
+  const found = await Blog.findOneAndUpdate({ _id: request.body.id, user: request.userId }, request.body)
   if (found) {
     response.status(200).json(found)
   }
   else {
     response.status(403).end()
+  }
+})
+
+blogRouter.patch('/:id/like', async (request, response) => {
+  console.log('patch request', request.params.id)
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    console.log('found blog', blog)
+    blog.likes += 1
+    blog.save()
+    response.status(200).end()
+  }
+  else {
+    response.status(404).end()
   }
 })
 module.exports = blogRouter

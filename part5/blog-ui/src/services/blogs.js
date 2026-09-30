@@ -17,10 +17,7 @@ const createBlog = async newBlog => {
 }
 
 const likeBlog = async (blog) => {
-  const config = {
-    headers: { Authorization: 'Bearer ' + token }
-  }
-  const resp = await axios.put(baseUrl, { ...blog, likes: blog.likes + 1, user: blog.user.id }, config)
+  const resp = await axios.patch(baseUrl+'/'+blog.id+'/like')
   return resp.data
 }
 
