@@ -7,6 +7,11 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link, useMatch, useNavigate
+} from 'react-router-dom'
+
 const App = () => {
   console.log('rendering app')
   const [blogs, setBlogs] = useState([])
@@ -16,6 +21,8 @@ const App = () => {
   const [refresh, setRefresh] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState('error')
+  const navigate = useNavigate()
+
 
   useEffect(() => {
     console.log('blogs effect')
@@ -95,66 +102,90 @@ const App = () => {
           <Blog key={blog.id}
             blog={blog}
             user={user}
+            view={(id) => navigate('/blogs/' + id)}
             refreshPage={() => { setRefresh(!refresh) }}
-            likeBlog={(lb) => {blogService.likeBlog(lb).then(() => { setRefresh(!refresh) })}} />
+            q={(lb) => { blogService.likeBlog(lb).then(() => { setRefresh(!refresh) }) }} />
         )}
       </div>
     )
   }
 
+
   const auth = () => {
-    if (!user)
-      return (
-        <div>
-          <h2>log into application</h2>
-          <form onSubmit={handleLogin}>
-            <div>
-              <label>
-                username
-                <input
-                  type='text'
-                  value={username}
-                  onChange={({ target }) => setUsername(target.value)}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                password
-                <input
-                  type='password'
-                  value={password}
-                  onChange={({ target }) => setPassword(target.value)}
-                />
-              </label>
-            </div>
-            <button type='submit'>login</button>
-          </form>
-        </div>
-      )
-    else
-      return (
-        <div>
-          <p>{user.username} logged in <>  </>
-            <button onClick={logout}>Logout</button>
-          </p>
-        </div>
-      )
+    return (
+      <div>
+        <h2>log into application</h2>
+        <form onSubmit={handleLogin}>
+          <div>
+            <label>
+              username
+              <input
+                type='text'
+                value={username}
+                onChange={({ target }) => setUsername(target.value)}
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              password
+              <input
+                type='password'
+                value={password}
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </label>
+          </div>
+          <button type='submit'>login</button>
+        </form>
+      </div>
+    )
   }
 
+  const padding = { padding: 5 }
+  const match = useMatch('/blogs/:id')
+  const chosenBlog = match
+    ? blogs.find(b => b.id === match.params.id)
+    : null
   return (
-    <div>
+    <>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        {user && <Link style={padding} to="/create">new blog</Link>}
 
-      <h2>blogs</h2>
-      <Notification message={notificationMessage} type={notificationType} />
-      {auth()}
-      {user &&
-        <Togglable initialState='false' label='create new blog'>
-          <BlogForm refreshPage={setRefresh} refreshState={refresh}></BlogForm>
-        </Togglable>
-      }
-      {user && blogList()}
-    </div>
+        {!user && <Link style={padding} to="/login">login</Link>}
+        {user && <button onClick={logout}>Logout</button>}
+
+      </div>
+
+      <div>
+
+        <Notification message={notificationMessage} type={notificationType} />
+      </div>
+
+      <Routes>
+        <Route path="/" element={
+          <div>
+            {blogList()}
+          </div>
+        } />
+        <Route path="/create" element={
+          <div>
+            <BlogForm refreshPage={setRefresh} refreshState={refresh}></BlogForm>
+          </div>
+        } />
+        <Route path="/login" element={auth()} />
+        <Route path="/blogs/:id" element={
+          <Blog
+            blog={chosenBlog}
+            user={user}
+            refreshPage={() => { setRefresh(!refresh) }}
+            likeBlog={(lb) => { blogService.likeBlog(lb).then(() => { setRefresh(!refresh) }) }}
+            detailed='true' />
+        } />
+      </Routes>
+
+    </>
   )
 }
 

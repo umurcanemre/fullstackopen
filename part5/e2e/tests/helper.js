@@ -40,11 +40,11 @@ const exitingBlogs = () => [testBlog1, testBlog2, testBlog3]
 
 const logout = async (page) => {
   await page.getByRole('button', { name: 'Logout' }).click()
-  await page.getByRole('button', { name: 'login' }).waitFor()
+  await page.getByText('logged out').waitFor()
 }
 
 const loginWith = async (page, username, password, isSuccess = true) => {
-  await page.getByRole('button', { name: 'login' }).click()
+  await page.goto('/login')
   await page.getByLabel('username').fill(username)
   await page.getByLabel('password').fill(password)
   await page.getByRole('button', { name: 'login' }).click()
@@ -54,8 +54,8 @@ const loginWith = async (page, username, password, isSuccess = true) => {
 }
 
 const createBlogs = async (page, blogs) => {
-  page.getByRole('button', { name: 'create new blog' }).click()
   for (let b of blogs) {
+    await page.goto('/create')
     await page.getByLabel('title:').fill(b.title)
     await page.getByLabel('author:').fill(b.author)
     await page.getByLabel('url').fill(b.url)

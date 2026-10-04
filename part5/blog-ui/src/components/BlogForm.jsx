@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import blogsService from '../services/blogs'
+import { useNavigate } from 'react-router-dom'
 
 const BlogForm = ({ refreshPage, refreshState }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const navigate = useNavigate()
 
   const createBlog = async () => {
     await blogsService.createBlog({ title, author, url })
+    navigate('/')
     refreshPage(!refreshState)
     setTitle('')
     setAuthor('')

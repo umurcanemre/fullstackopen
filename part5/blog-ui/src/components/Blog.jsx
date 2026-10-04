@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import blogsService from '../services/blogs'
 
 const blogStyle = {
@@ -8,13 +7,11 @@ const blogStyle = {
   borderWidth: 1,
   marginBottom: 5
 }
-const Blog = ({ blog, user, refreshPage, likeBlog }) => {
-  const [detailed, setDetailed] = useState(false)
+const Blog = ({ blog, user, refreshPage, likeBlog, view, detailed = false }) => {
   const showDetails = { display: detailed ? '' : 'none' }
   const hideDetails = { display: detailed ? 'none' : '' }
-  const showDeleteButton = { display: user.id === blog.user.id ? '' : 'none' }
+  const showDeleteButton = { display: user?.id === blog.user.id ? '' : 'none' }
 
-  const toggleDetail = () => setDetailed(!detailed)
   // const likeCurrent = () => likeBlog(blog).then(() => { refreshPage() })
   const deleteCurrent = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
@@ -25,11 +22,10 @@ const Blog = ({ blog, user, refreshPage, likeBlog }) => {
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author}
-      <button style={hideDetails} onClick={toggleDetail}>view</button>
-      <button style={showDetails} onClick={toggleDetail}>hide</button>
+      <button style={hideDetails} onClick={() => view(blog.id)}>view</button>
       <div className='blogDetails' style={showDetails}>
         <div>{blog.url}</div>
-        <div>likes {blog.likes}<button onClick={() => likeBlog(blog)}>like</button></div>
+        <div>likes {blog.likes} {user && user.id !== blog.user.id && <button onClick={() => likeBlog(blog)}>like</button>} </div>
         <div>{blog.user.username}</div>
         <div style={showDeleteButton}><button onClick={deleteCurrent}>remove</button></div>
       </div>
