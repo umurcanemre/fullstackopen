@@ -6,10 +6,12 @@ import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { Container, TableContainer, Table, TableHead, TableRow, TableBody, TableCell, Paper, Button } from '@mui/material'
+import { TextField, AppBar, Toolbar } from '@mui/material'
 
 import {
   BrowserRouter as Router,
-  Routes, Route, Link, useMatch, useNavigate
+  Routes, Route, Link, useMatch
 } from 'react-router-dom'
 
 const App = () => {
@@ -21,7 +23,6 @@ const App = () => {
   const [refresh, setRefresh] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState('error')
-  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const App = () => {
       setPassword('')
 
       setNotificationMessage('logged in')
-      setNotificationType('ok')
+      setNotificationType('success')
       setTimeout(() => {
         setNotificationMessage(null)
       }, 3000)
@@ -89,7 +90,7 @@ const App = () => {
     setUser(null)
     window.localStorage.removeItem('loggedBlogAppUser')
     setNotificationMessage('logged out')
-    setNotificationType('ok')
+    setNotificationType('success')
     setTimeout(() => {
       setNotificationMessage(null)
     }, 3000)
@@ -98,14 +99,23 @@ const App = () => {
   const blogList = () => {
     return (
       <div>
-        {blogs.map(blog =>
-          <Blog key={blog.id}
-            blog={blog}
-            user={user}
-            view={(id) => navigate('/blogs/' + id)}
-            refreshPage={() => { setRefresh(!refresh) }}
-            q={(lb) => { blogService.likeBlog(lb).then(() => { setRefresh(!refresh) }) }} />
-        )}
+        <h2>Blogs</h2>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {blogs.map((blog) =>
+                <TableRow key={blog.id}>
+                  <TableCell>
+                    <Link style={padding} to={'/blogs/' + blog.id}>{blog.title}</Link>
+                  </TableCell>
+                  <TableCell>
+                    {blog.author}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     )
   }
@@ -117,26 +127,24 @@ const App = () => {
         <h2>log into application</h2>
         <form onSubmit={handleLogin}>
           <div>
-            <label>
-              username
-              <input
-                type='text'
-                value={username}
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </label>
+            <TextField
+              label='username'
+              value={username}
+              style={{ marginTop: 10 }}
+              onChange={({ target }) => setUsername(target.value)}
+            />
+
           </div>
           <div>
-            <label>
-              password
-              <input
-                type='password'
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </label>
+            <TextField
+              label='password'
+              type='password'
+              value={password}
+              style={{ marginTop: 10 }}
+              onChange={({ target }) => setPassword(target.value)}
+            />
           </div>
-          <button type='submit'>login</button>
+          <Button type='submit' style={{ marginTop: 10 }}>login</Button>
         </form>
       </div>
     )
@@ -148,14 +156,16 @@ const App = () => {
     ? blogs.find(b => b.id === match.params.id)
     : null
   return (
-    <>
+    <Container>
       <div>
-        <Link style={padding} to="/">blogs</Link>
-        {user && <Link style={padding} to="/create">new blog</Link>}
-
-        {!user && <Link style={padding} to="/login">login</Link>}
-        {user && <button onClick={logout}>Logout</button>}
-
+        <AppBar position="static">
+          <Toolbar>
+            <Button color="inherit" component={Link} to="/">Home</Button>
+            {user && <Button color="inherit" component={Link} to="/create">New Blog</Button>}
+            {!user && <Button color="inherit" component={Link} to="/login">Login</Button>}
+            {user && <Button color="inherit" onClick={logout}>Logout</Button>}
+          </Toolbar>
+        </AppBar>
       </div>
 
       <div>
@@ -181,11 +191,11 @@ const App = () => {
             user={user}
             refreshPage={() => { setRefresh(!refresh) }}
             likeBlog={(lb) => { blogService.likeBlog(lb).then(() => { setRefresh(!refresh) }) }}
-            detailed='true' />
+          />
         } />
       </Routes>
 
-    </>
+    </Container >
   )
 }
 

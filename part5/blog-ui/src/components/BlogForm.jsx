@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import blogsService from '../services/blogs'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const BlogForm = ({ refreshPage, refreshState }) => {
   const [title, setTitle] = useState('')
@@ -20,34 +21,25 @@ const BlogForm = ({ refreshPage, refreshState }) => {
   return (
     <div>
       <h2>Create New</h2>
-      <label>
-        title:
-        <input
-          type="text"
-          value={title}
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </label>
+      <TextField
+        label='title'
+        value={title}
+        onChange={({ target }) => setTitle(target.value)}
+      />
       <br />
-      <label>
-        author:
-        <input
-          type="text"
-          value={author}
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </label>
+      <TextField
+        label='author'
+        value={author}
+        onChange={({ target }) => setAuthor(target.value)}
+      />
       <br />
-      <label>
-        url:
-        <input
-          type="text"
-          value={url}
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </label>
+      <TextField
+        label='url'
+        value={url}
+        onChange={({ target }) => setUrl(target.value)}
+      />
       <br />
-      <button onClick={createBlog}>create</button>
+      <Button type="submit" variant="contained" style={{ marginTop: 10 }} onClick={createBlog}>create</Button>
     </div>
   )
 }

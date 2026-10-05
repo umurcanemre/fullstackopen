@@ -10,12 +10,13 @@ import noteService from './services/notes'
 import Notification from './components/Notification'
 import Footer from './components/Footer'
 import { Routes, Route, Link, useMatch } from 'react-router-dom'
+import { Container, AppBar, Toolbar, Button } from '@mui/material'
 
 const App = () => {
   const noteFormRef = useRef()
   const [notes, setNotes] = useState([])
   const [reloadFlag, setReloadFlag] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notification, setNotification] = useState({})
   // const [username, setUsername] = useState('')
   // const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -49,9 +50,9 @@ const App = () => {
         setReloadFlag(!reloadFlag)
       })
       .catch(() => {
-        setErrorMessage(`Note couldn't be updated`)
+        setNotification({ message: 'Note couldn\'t be updated', type: 'error' })
         setTimeout(() => {
-          setErrorMessage(null)
+          setNotification({})
         }, 5000)
       })
   }
@@ -61,9 +62,9 @@ const App = () => {
         console.log('removed note ' + note.id)
       })
       .catch(() => {
-        setErrorMessage(`Note couldn't be deleted`)
+        setNotification({ message: 'Note couldn\'t be deleted', type: 'error' })
         setTimeout(() => {
-          setErrorMessage(null)
+          setNotification({})
         }, 5000)
       })
     setReloadFlag(!reloadFlag)
@@ -94,27 +95,34 @@ const App = () => {
     .then(() => {
       // noteFormRef.current.toggleVisibility()
       setReloadFlag(!reloadFlag)
+      setNotification({ message: `Note added!`, type: 'success' })
+      setTimeout(() => {
+        setNotification({})
+      }, 5000)
     })
     .catch(() => {
-      setErrorMessage(`Note couldn't be created`)
+      setNotification({ message: 'Note couldn\'t be created', type: 'error' })
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotification({})
       }, 5000)
     })
   const padding = {
     padding: 5
   }
+  const hoverStyle = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">home</Link>
-        <Link style={padding} to="/notes">notes</Link>
-        <Link style={padding} to="/create">new note</Link>
-        <Link style={padding} to="/account">account</Link>
-      </div>
-
-      <Notification message={errorMessage} />
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/" sx={hoverStyle}>home</Button>
+          <Button color="inherit" component={Link} to="/notes" sx={hoverStyle}>notes</Button>
+          <Button color="inherit" component={Link} to="/create" sx={hoverStyle}>new note</Button>
+          <Button color="inherit" component={Link} to="/account" sx={hoverStyle}>account</Button>
+        </Toolbar>
+      </AppBar>
+      
+      <Notification message={notification.message} type={notification.type} />
 
       <Routes>
         <Route path="/notes/:id" element={
@@ -125,9 +133,9 @@ const App = () => {
             notes={notes}
             reload={() => setReloadFlag(!reloadFlag)}
             errNotif={() => {
-              setErrorMessage(`Note couldn't be updated`)
+              setNotification(`Note couldn't be updated`)
               setTimeout(() => {
-                setErrorMessage(null)
+                setNotification(null)
               }, 5000)
             }}
           />
@@ -137,10 +145,10 @@ const App = () => {
         } />
         <Route path="/" element={<Home />} />
         <Route path="/account" element={<LoginForm setUser={setUser}
-          setErrorMessage={setErrorMessage} />} />
+          setErrorMessage={setNotification} />} />
       </Routes>
       <Footer />
-    </div>
+    </Container>
   )
 }
 
